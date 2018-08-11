@@ -1,17 +1,25 @@
-cmake_minimum_required(VERSION 3.9)
-project(kraken VERSION 1.0.1 DESCRIPTION "kraken programming language" LANGUAGES CXX)
+cmake_minimum_required(VERSION 3.2)
+project("Kraken Compiler")
 
-set(CMAKE_CXX_FLAGS "-std=c++17 -Wall -Wextra -Wpedantic")
-set(CMAKE_CXX_FLAGS_DEBUG "-g")
-set(CMAKE_CXX_FLAGS_RELEASE "-O3")
+set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
 
-file(GLOB Sources "src/driver.cpp")
+set(EXT_DIR "ext")
+set(BIN_DIR "bin")
+set(INC_DIR "inc")
+set(SRC_DIR "src")
+set(TEST_DIR "test")
 
-include_directories(inc)
-add_subdirectory(src)
+set(SRC ${SRC_DIR}/driver.cpp)
 
-add_executable(kraken ${Sources})
-target_link_libraries(kraken
-    root_dir
-    filesystem_dir
-)
+set(EXECUTABLE_NAME "kkc")
+
+add_subdirectory(${EXT_DIR}/gtest-1.7.0)
+add_subdirectory(${SRC_DIR})
+add_subdirectory(${TEST_DIR})
+include_directories(${INC_DIR})
+
+add_executable(${EXECUTABLE_NAME} ${SRC})
+target_link_libraries(${EXECUTABLE_NAME} kraken)
+
+install(TARGETS ${EXECUTABLE_NAME} DESTINATION ${BIN_DIR})

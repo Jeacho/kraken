@@ -3,7 +3,7 @@
 
 using namespace fs;
 
-bool path::is_file() noexcept {
+bool path::is_file() const noexcept {
 #if defined(MACOS) || defined(LINUX)
     struct stat s;
     if(stat(this->data(), &s) != 0)
@@ -25,14 +25,14 @@ bool path::is_file() noexcept {
 #endif
 }
 
-bool is_dir(const char *p) noexcept {
+bool path::is_dir() const noexcept {
 #if defined(MACOS) || defined(LINUX)
     struct stat s;
-    if(stat(p, &s) != 0)
+    if(stat(this->data(), &s) != 0)
         return false;
     return S_ISDIR(s.st_mode);
 #elif defined(WINDOWS)
-    DWORD fileAttributes = GetFileAttributesA(p);
+    DWORD fileAttributes = GetFileAttributesA(this->data());
 
     if (fileAttributes == INVALID_FILE_ATTRIBUTES)
         return false;
@@ -46,7 +46,7 @@ bool is_dir(const char *p) noexcept {
 #endif
 }
 
-bool path::exists() noexcept {
+bool path::exists() const noexcept {
 #if defined(MACOS) || defined(LINUX)
     struct stat s;
     return (stat(p, &s) == 0);
@@ -60,4 +60,31 @@ bool path::exists() noexcept {
 #else
     platform_error();
 #endif
+}
+
+path path::extension() const noexcept {
+    if (this->empty())
+        return path{};
+
+    for (char *index = this->end(); index != this->begin(); index--) {
+        switch (*index) {
+        case '.':
+            if (index != 0 && *(index - 1) != '.')
+                return path(index, this->end());
+
+        case '\a': case '\b': case '\t': case '\n':
+        case '\v': case '\f': case '\r':
+
+#if defined(__clang__)
+        case '\e':
+#endif
+
+        case '\0': case '\\': case '/': case '*':
+        case '<': case '>': case '|': case '\"':
+            break;
+
+        }
+    }
+
+    return path{};
 }

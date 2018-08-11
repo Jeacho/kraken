@@ -14,7 +14,5 @@
 #elif defined(__unix__) || defined(__unix)
 # define LINUX
 #endif
-
-#define platform_error #error("error: kraken only unix and windows platforms.")
-
+# define platform_error #error("error: kraken only unix and windows platforms.")
 #endif // KRAKEN_SUPPORT_COMPILER_H
