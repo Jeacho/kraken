@@ -10,11 +10,11 @@ class token {
     const type kind;
 
     // \brief This tokens lexeme.
-    wchar_t *m_begin,
-            *m_end;
+    wsegment lexeme;
 
 public:
-    token(type k) : kind(k) { /* pass */ }
+    token(type k, wsegment l)
+         : kind(k), lexeme(l) { /* pass */ }
 };
 
 } // namespace tok

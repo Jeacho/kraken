@@ -6,6 +6,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
 
 set(SOURCE_FILES test_entry.cpp
     adt/either_test.cpp
+    adt/segment_test.cpp
     filesystem/path_test.cpp
     filesystem/io_test.cpp
     memory/buffer_test.cpp

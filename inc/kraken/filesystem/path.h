@@ -6,6 +6,7 @@
 #include <string>
 
 #include "kraken/support/compiler.h"
+#include "kraken/adt/segment.h"
 
 #if defined(MACOS) || defined(LINUX)
 # include <sys/stat.h>
@@ -16,71 +17,136 @@
 
 namespace fs {
 
-class path {
-    const char *m_data;
+namespace detail {
 
-    const std::size_t m_length;
+    template<typename char_type>
+    using basic_segment = ::detail::basic_segment<char_type>;
 
-public:
-    constexpr path() noexcept
-         : m_data(nullptr), m_length(0) { /*pass */}
+template<typename char_type>
+struct basic_path : public basic_segment<char_type> {
+    typedef char_type           value_type;
+    typedef char_type *         pointer;
+    typedef const char_type *   const_pointer;
+    typedef char_type &         reference;
+    typedef const char_type &   const_reference;
+    typedef std::size_t         size_type;
+    typedef std::ptrdiff_t      difference_type;
 
-    path(const std::string &str) noexcept
-         : m_data(str.data()), m_length(str.size()) { /* pass */ }
+    constexpr basic_path() noexcept
+         : basic_segment<char_type>() { /* pass */ }
 
-    constexpr path(const char *be, const char *en) noexcept
-         : m_data(be), m_length(en - be) {
+    basic_path(const std::string &str) noexcept
+         : basic_segment<char_type>(str.data(), str.size()) { /* pass */ }
+
+    constexpr basic_path(const_pointer be, const_pointer en) noexcept
+         : basic_segment<char_type>(be, difference_type(en - be)) {
         assert(be < en);
     }
 
-    constexpr path(const char *cstr, std::size_t len) noexcept
-         : m_data(cstr), m_length(len) {
-        /* pass */
+    constexpr basic_path(const char *cstr, std::size_t len) noexcept
+         : basic_segment<char_type>(cstr, len) { /* pass */ }
+
+    constexpr basic_path(pointer cstr) noexcept
+         : basic_segment<char_type>(cstr) { /* pass */ }
+
+    // \brief Portable basic_path check to see if this basic_path is a file.
+    bool is_file() const noexcept {
+#if defined(MACOS) || defined(LINUX)
+        struct stat s;
+        if(stat(this->data(), &s) != 0)
+            return false;
+        return S_ISREG(s.st_mode);
+#elif defined(WINDOWS)
+        DWORD file_attributes = GetFileAttributesA(this->data());
+
+        if (file_attributes == INVALID_FILE_ATTRIBUTES)
+            return false;
+
+        if (file_attributes == FILE_ATTRIBUTE_NORMAL
+         || file_attributes == FILE_ATTRIBUTE_ARCHIVE)
+            return true;
+
+        return false;
+#else
+        platform_error();
+#endif
     }
 
-    constexpr path(const char *cstr) noexcept
-         : path(cstr, std::strlen(cstr)) { /* pass */ }
+    // \brief Portable basic_path check to see if this basic_path is a directory.
+    bool is_dir() const noexcept {
+#if defined(MACOS) || defined(LINUX)
+        struct stat s;
+        if(stat(this->data(), &s) != 0)
+            return false;
+        return S_ISDIR(s.st_mode);
+#elif defined(WINDOWS)
+        DWORD fileAttributes = GetFileAttributesA(this->data());
 
-    // \brief Returns the length of this path's string.
-    constexpr inline std::size_t size() const noexcept {
-        return m_length;
+        if (fileAttributes == INVALID_FILE_ATTRIBUTES)
+            return false;
+
+        if (fileAttributes == FILE_ATTRIBUTE_DIRECTORY)
+            return true;
+
+        return false;
+#else
+        platform_error();
+#endif
     }
 
-    // \brief Returns a pointer to this path's string.
-    constexpr inline const char *data() const noexcept {
-        return m_data;
+    // \brief See if this basic_path exists
+    bool exists() const noexcept {
+#if defined(MACOS) || defined(LINUX)
+        struct stat s;
+        return (stat(this->data(), &s) == 0);
+#elif defined(WINDOWS)
+        DWORD fileAttributes = GetFileAttributesA(this->data());
+
+        if (fileAttributes == INVALID_FILE_ATTRIBUTES)
+            return false;
+
+        return true;
+#else
+        platform_error();
+#endif
     }
 
-    // \brief Returns if this path is empty
-    constexpr inline bool empty() const noexcept {
-        return this->data() == nullptr;
+    // \brief Extracts the files extension from this basic_path.
+    // NOTE: if no extension is provided a empty basic_path is returned.
+    basic_path extension() const noexcept {
+        if (this->empty())
+            return basic_path{};
+
+        for (char *index = this->end(); index != this->begin(); index--) {
+            switch (*index) {
+            case '.':
+                if (index != 0 && *(index - 1) != '.')
+                    return basic_path(index, this->end());
+
+            case '\a': case '\b': case '\t': case '\n':
+            case '\v': case '\f': case '\r':
+
+#if defined(__clang__)
+            case '\e':
+#endif
+
+            case '\0': case '\\': case '/': case '*':
+            case '<': case '>': case '|': case '\"':
+                break;
+
+            }
+        }
+
+        return basic_path{};
     }
-
-    // \brief Iterator access to the path as a sequence of elements.
-    constexpr inline char *begin() const {
-        return const_cast<char *>(this->data());
-    }
-    constexpr inline char *end() const {
-        return const_cast<char *>(this->data()) + this->size();
-    }
-
-    const char *c_str()     const { return m_data;              } 
-    std::string str()       const { return std::string(m_data); }
-    operator std::string()  const { return str();               }
-
-    // \brief Portable path check to see if this path is a file.
-    bool is_file() const noexcept;
-
-    // \brief Portable path check to see if this path is a directory.
-    bool is_dir() const noexcept;
-
-    // \brief See if this path exists
-    bool exists() const noexcept;
-
-    // \brief Extracts the files extension from this path.
-    // NOTE: if no extension is provided a empty path is returned.
-    path extension() const noexcept;
 };
+
+} // namespace detail
+
+typedef detail::basic_path<char>        path;
+typedef detail::basic_path<wchar_t>     wpath;
+typedef detail::basic_path<char16_t>    u16path;
+typedef detail::basic_path<char32_t>    u32path;
 
 } // namespace fs
 

@@ -11,9 +11,11 @@
 # include <windows.h>
 #endif
 
+namespace detail {
+
 static int colorize_index = std::ios_base::xalloc();
 
-static FILE *get_stdstream(const std::ostream &stream) noexcept {
+static constexpr FILE *get_stdstream(std::ostream &stream) noexcept {
     if (&stream == &std::cout)
         return stdout;
     else if ((&stream == &std::cerr) || (&stream == &std::clog))
@@ -22,26 +24,24 @@ static FILE *get_stdstream(const std::ostream &stream) noexcept {
     return nullptr;
 }
 
-static bool has_atty(const std::ostream &stream) {
+static bool is_atty(std::ostream &stream) {
     FILE *stdstream = get_stdstream(stream);
 
     if (!stdstream) return false;
 
 #if defined(MACOS) || defined(LINUX)
-    return ::isatty(fileno(stdstream));
+    return ::isatty(fileno(stdstream))
+        || static_cast<bool>(stream.iword(colorize_index));;
 #elif defined(WINDOWS)
-    return ::_isatty(_fileno(stdstream));
+    return ::_isatty(_fileno(stdstream))
+        || static_cast<bool>(stream.iword(colorize_index));;
 #endif
-}
-
-static inline bool is_colorized(std::ostream &stream) {
-   return has_atty(stream) || static_cast<bool>(stream.iword(colorize_index));
 }
 
 #if defined(WINDOWS)
 
 // \brief Sets the windows console's color attributes.
-static void win_set_atty(std::ostream &stream, int fg, int bg) {
+static void win32_atty(std::ostream &stream, int fg, int bg) {
     static WORD defaultAttributes = 0;
 
     if (!has_atty(stream))
@@ -84,126 +84,67 @@ static void win_set_atty(std::ostream &stream, int fg, int bg) {
 
 #endif // WINDOWS
 
-std::ostream &reset(std::ostream &stream);
+} // namespace detail
 
 #if defined(MACOS) || defined(LINUX)
-std::ostream &bold(std::ostream &stream);
+# define COLOR(name, ansi, win32_fg, win32_bg)                      \
+std::ostream &name(std::ostream &stream) {                          \
+    if (__builtin_expect(detail::is_atty(stream), 1))               \
+        stream << "\033[" #ansi "m";                                \
+    return stream;                                                  \
+}
+#elif defined(WINDOWS)
+# define COLOR(name, ansi, win32_fg, win32_bg)                      \
+std::ostream &name(std::ostream &stream) {                          \
+    if (__builtin_expect(detail::is_atty(stream), 1))               \
+        detail::win32_atty(stream, win32_fg, win32_bg);             \
+    return stream;                                                  \
+}
+#elif
+# define COLOR
+#endif
+
+#define FG_COLOR(name, ansi, win32_fg) \
+    COLOR(name, ansi, win32_fg, -1)
+
+#define BG_COLOR(name, ansi, win32_bg) \
+    COLOR(name, ansi, -1, win32_bg)
+
+COLOR(reset, 00, -1, 01)
+
+std::ostream &bold(std::ostream &stream) {
+    if (__builtin_expect(detail::is_atty(stream), 1))
+#if defined(MACOS) || defined(LINUX)
+        stream << "\033[1m";
+#endif
+    return stream;
+}
+
 std::ostream &dark(std::ostream &stream);
 std::ostream &underline(std::ostream &stream);
 std::ostream &blink(std::ostream &stream);
-#endif
 
 namespace fg {
 
-// \brief Foreground colors
-std::ostream &grey(std::ostream &stream) {
-    if (is_colorized(stream))
-#if defined(MACOS) || defined(LINUX)
-        stream << "\033[40m";
-#elif defined(WINDOWS)
-        win_set_atty(stream, 8, 0);
-#endif
-    return stream;
-}
-
-std::ostream &red(std::ostream &stream) {
-   if (is_colorized(stream))
-#if defined(MACOS) || defined(LINUX)
-       stream << "\033[31m";
-#elif defined(WINDOWS)
-       win_set_atty(stream, 4, 0);
-#endif
-   return stream;
-}
-
-std::ostream &green(std::ostream &stream) {
-   if (is_colorized(stream))
-#if defined(MACOS) || defined(LINUX)
-       stream << "\033[31m";
-#elif defined(WINDOWS)
-       win_set_atty(stream, 4, 0);
-#endif
-   return stream;
-}
-
-std::ostream &yellow(std::ostream &stream) {
-    if (is_colorized(stream))
-#if defined(MACOS) || defined(LINUX)
-        stream << "\033[33m";
-#elif defined(WINDOWS)
-        win_set_atty(stream, FG_GREEN | FG_RED);
-#endif
-    return stream;
-}
-
-std::ostream &blue(std::ostream &stream) {
-    if (is_colorized(stream))
-#if defined(MACOS) || defined(LINUX)
-        stream << "\033[34m";
-#elif defined(WINDOWS)
-        win_set_atty(stream, FG_BLUE);
-#endif
-    return stream;
-}
-
-std::ostream &magenta(std::ostream &stream) {
-    if (is_colorized(stream))
-#if defined(MACOS) || defined(LINUX)
-        stream << "\033[35m";
-#elif defined(WINDOWS)
-        win_set_atty(stream, FG_BLUE | FG_RED);
-#endif
-    return stream;
-}
-
-std::ostream &cyan(std::ostream &stream) {
-    if (is_colorized(stream))
-#if defined(MACOS) || defined(LINUX)
-        stream << "\033[36m";
-#elif defined(WINDOWS)
-        win_set_atty(stream, FG_BLUE | FG_GREEN);
-#endif
-    return stream;
-}
-
-std::ostream &white(std::ostream &stream) {
-   if (is_colorized(stream))
-#if defined(MACOS) || defined(LINUX)
-       stream << "\033[37m";
-#elif defined(WINDOWS)
-       win_set_atty(stream, 15, 0);
-#endif
-   return stream;
-}
+FG_COLOR(black,     30, 0);
+FG_COLOR(red,       31, FOREGROUND_RED)
+FG_COLOR(green,     32, FOREGROUND_GREEN)
+FG_COLOR(yellow,    33, FOREGROUND_GREEN | FOREGROUND_RED)
+FG_COLOR(blue,      34, FOREGROUND_BLUE)
+FG_COLOR(magenta,   35, FOREGROUND_BLUE | FOREGROUND_RED)
+FG_COLOR(cyan,      36, FOREGROUND_BLUE | FOREGROUND_GREEN)
+FG_COLOR(white,     37, FOREGROUND_BLUE | FOREGROUND_GREEN | FOREGROUND_RED)
 
 namespace br {
 
-std::ostream &grey(std::ostream &stream) {
-    if (is_colorized(stream))
-#if defined(MACOS) || defined(LINUX)
-        stream << "\033[90m";
-#elif defined(WINDOWS)
-        win_set_atty(stream, 0   /* grey */);
-#endif
-    return stream;
-}
-
-std::ostream &red(std::ostream &stream);
-std::ostream &green(std::ostream &stream);
-std::ostream &yellow(std::ostream &stream);
-std::ostream &blue(std::ostream &stream);
-std::ostream &magenta(std::ostream &stream);
-std::ostream &cyan(std::ostream &stream);
-
-std::ostream &white(std::ostream &stream) {
-    if (is_colorized(stream))
-#if defined(MACOS) || defined(LINUX)
-        stream << "\033[97m";
-#elif defined(WINDOWS)
-        win_set_atty(stream, FG_BLUE | FG_GREEN | FG_RED);
-#endif
-    return stream;
-}
+FG_COLOR(black,     90, FOREGROUND_INTENSITY);
+FG_COLOR(red,       91, FOREGROUND_INTENSITY | FOREGROUND_RED)
+FG_COLOR(green,     92, FOREGROUND_INTENSITY | FOREGROUND_GREEN)
+FG_COLOR(yellow,    93, FOREGROUND_INTENSITY | FOREGROUND_GREEN | FOREGROUND_RED)
+FG_COLOR(blue,      94, FOREGROUND_INTENSITY | FOREGROUND_BLUE)
+FG_COLOR(magenta,   95, FOREGROUND_INTENSITY | FOREGROUND_BLUE | FOREGROUND_RED)
+FG_COLOR(cyan,      96, FOREGROUND_INTENSITY | FOREGROUND_BLUE | FOREGROUND_GREEN)
+FG_COLOR(white,     97, FOREGROUND_INTENSITY | FOREGROUND_BLUE | FOREGROUND_GREEN | FOREGROUND_RED)
 
 } // namesapce br
 
@@ -211,27 +152,25 @@ std::ostream &white(std::ostream &stream) {
 
 namespace bg {
 
-// \brief Background colors
-std::ostream &grey(std::ostream &stream);
-std::ostream &red(std::ostream &stream);
-std::ostream &green(std::ostream &stream);
-std::ostream &yellow(std::ostream &stream);
-std::ostream &blue(std::ostream &stream);
-std::ostream &magenta(std::ostream &stream);
-std::ostream &cyan(std::ostream &stream);
-std::ostream &white(std::ostream &stream);
+BG_COLOR(black,     40, 0);
+BG_COLOR(red,       41, FOREGROUND_RED)
+BG_COLOR(green,     42, FOREGROUND_GREEN)
+BG_COLOR(yellow,    43, FOREGROUND_GREEN | FOREGROUND_RED)
+BG_COLOR(blue,      44, FOREGROUND_BLUE)
+BG_COLOR(magenta,   45, FOREGROUND_BLUE | FOREGROUND_RED)
+BG_COLOR(cyan,      46, FOREGROUND_BLUE | FOREGROUND_GREEN)
+BG_COLOR(white,     47, FOREGROUND_BLUE | FOREGROUND_GREEN | FOREGROUND_RED)
 
 namespace br {
 
-// \brief Bright background colors
-std::ostream &grey(std::ostream &stream);
-std::ostream &red(std::ostream &stream);
-std::ostream &green(std::ostream &stream);
-std::ostream &yellow(std::ostream &stream);
-std::ostream &blue(std::ostream &stream);
-std::ostream &magenta(std::ostream &stream);
-std::ostream &cyan(std::ostream &stream);
-std::ostream &white(std::ostream &stream);
+BG_COLOR(black,     100, FOREGROUND_INTENSITY);
+BG_COLOR(red,       101, FOREGROUND_INTENSITY | FOREGROUND_RED)
+BG_COLOR(green,     102, FOREGROUND_INTENSITY | FOREGROUND_GREEN)
+BG_COLOR(yellow,    103, FOREGROUND_INTENSITY | FOREGROUND_GREEN | FOREGROUND_RED)
+BG_COLOR(blue,      104, FOREGROUND_INTENSITY | FOREGROUND_BLUE)
+BG_COLOR(magenta,   105, FOREGROUND_INTENSITY | FOREGROUND_BLUE | FOREGROUND_RED)
+BG_COLOR(cyan,      106, FOREGROUND_INTENSITY | FOREGROUND_BLUE | FOREGROUND_GREEN)
+BG_COLOR(white,     107, FOREGROUND_INTENSITY | FOREGROUND_BLUE | FOREGROUND_GREEN | FOREGROUND_RED)
 
 } // namesapce br
 
