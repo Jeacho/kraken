@@ -1,0 +1,1 @@
+/usr/bin/c++   -std=c++14  -rdynamic CMakeFiles/kkc.dir/src/driver.cpp.o  -o kkc src/libkraken.a 
