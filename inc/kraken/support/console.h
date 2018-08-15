@@ -6,21 +6,6 @@
 
 #include "kraken/support/compiler.h"
 
-namespace detail {
-
-    // \brief Returns the FILE * to the standard stream; however, if a standard
-    // stream is not provided it returns nullptr.
-    static constexpr FILE *get_stdstream(std::ostream &stream) noexcept;
-
-    // \brief Returns if the stream provided refers to a terminal.
-    static bool has_atty(std::ostream &stream);
-
-#if defined(WINDOWS)
-    // \brief Special win32 implementation for changing terminal attributes.
-    static void win32_atty(std::ostream &stream, int fg, int bg);
-#endif
-
-} // namespace detail
 
 std::ostream &reset(std::ostream &stream);
 std::ostream &bold(std::ostream &stream);

@@ -5,6 +5,10 @@
 #include "kraken/support/console.h"
 #include "kraken/filesystem/io.h"
 
+std::ostream &__KKC(std::ostream &stream) {
+    return stream << bold << fg::blue << "[ KKC ] ";
+}
+
 int main(int argc, char *argv[]) {
     std::vector<std::unique_ptr<mem::buffer>> paths;
     std::vector<segment> args;
@@ -30,7 +34,7 @@ int main(int argc, char *argv[]) {
     }
 
     if (paths.empty()) {
-        std::cerr << fg::blue << "kkc: " << reset << "No input files..." << std::endl;
+        std::cerr << __KKC << reset << "No input files..." << std::endl;
         return 0;
     }
 

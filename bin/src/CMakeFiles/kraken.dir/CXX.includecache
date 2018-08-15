@@ -68,19 +68,19 @@ cstdio
 kraken/support/compiler.h
 ../src/../inc/kraken/support/kraken/support/compiler.h
 
-/home/jacob/Documents/kraken/src/filesystem/io.cpp
+C:/Users/jake/Desktop/kraken/src/filesystem/io.cpp
 fstream
 -
 kraken/filesystem/io.h
-/home/jacob/Documents/kraken/src/filesystem/kraken/filesystem/io.h
+C:/Users/jake/Desktop/kraken/src/filesystem/kraken/filesystem/io.h
 
-/home/jacob/Documents/kraken/src/memory/buffer.cpp
+C:/Users/jake/Desktop/kraken/src/memory/buffer.cpp
 kraken/memory/buffer.h
-/home/jacob/Documents/kraken/src/memory/kraken/memory/buffer.h
+C:/Users/jake/Desktop/kraken/src/memory/kraken/memory/buffer.h
 
-/home/jacob/Documents/kraken/src/support/console.cpp
+C:/Users/jake/Desktop/kraken/src/support/console.cpp
 kraken/support/console.h
-/home/jacob/Documents/kraken/src/support/kraken/support/console.h
+C:/Users/jake/Desktop/kraken/src/support/kraken/support/console.h
 iostream
 -
 cstdio

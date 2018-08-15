@@ -1,2 +1,2 @@
-/usr/bin/ar qc libkraken.a  CMakeFiles/kraken.dir/filesystem/io.cpp.o CMakeFiles/kraken.dir/memory/buffer.cpp.o CMakeFiles/kraken.dir/support/console.cpp.o
-/usr/bin/ranlib libkraken.a
+C:\MinGW\bin\ar.exe qc libkraken.a  CMakeFiles/kraken.dir/filesystem/io.cpp.obj CMakeFiles/kraken.dir/memory/buffer.cpp.obj CMakeFiles/kraken.dir/support/console.cpp.obj
+C:\MinGW\bin\ranlib.exe libkraken.a

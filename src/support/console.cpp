@@ -13,39 +13,11 @@
 
 namespace detail {
 
-static int colorize_index = std::ios_base::xalloc();
-
-static constexpr FILE *get_stdstream(std::ostream &stream) noexcept {
-    if (&stream == &std::cout)
-        return stdout;
-    else if ((&stream == &std::cerr) || (&stream == &std::clog))
-        return stderr;
-
-    return nullptr;
-}
-
-static bool is_atty(std::ostream &stream) {
-    FILE *stdstream = get_stdstream(stream);
-
-    if (!stdstream) return false;
-
-#if defined(MACOS) || defined(LINUX)
-    return ::isatty(fileno(stdstream))
-        || static_cast<bool>(stream.iword(colorize_index));;
-#elif defined(WINDOWS)
-    return ::_isatty(_fileno(stdstream))
-        || static_cast<bool>(stream.iword(colorize_index));;
-#endif
-}
-
 #if defined(WINDOWS)
 
 // \brief Sets the windows console's color attributes.
 static void win32_atty(std::ostream &stream, int fg, int bg) {
     static WORD defaultAttributes = 0;
-
-    if (!has_atty(stream))
-        return;
 
     HANDLE hTerminal = INVALID_HANDLE_VALUE;
     if (&stream == &std::cout)
@@ -86,18 +58,15 @@ static void win32_atty(std::ostream &stream, int fg, int bg) {
 
 } // namespace detail
 
-#if defined(MACOS) || defined(LINUX)
+#if defined(MACOS) || defined(LINUX) || defined(__MINGW32__)
 # define COLOR(name, ansi, win32_fg, win32_bg)                      \
 std::ostream &name(std::ostream &stream) {                          \
-    if (__builtin_expect(detail::is_atty(stream), 1))               \
-        stream << "\033[" #ansi "m";                                \
-    return stream;                                                  \
+    return stream << "\033[" #ansi "m";                             \
 }
 #elif defined(WINDOWS)
 # define COLOR(name, ansi, win32_fg, win32_bg)                      \
 std::ostream &name(std::ostream &stream) {                          \
-    if (__builtin_expect(detail::is_atty(stream), 1))               \
-        detail::win32_atty(stream, win32_fg, win32_bg);             \
+    detail::win32_atty(stream, win32_fg, win32_bg);                 \
     return stream;                                                  \
 }
 #elif
@@ -110,19 +79,37 @@ std::ostream &name(std::ostream &stream) {                          \
 #define BG_COLOR(name, ansi, win32_bg) \
     COLOR(name, ansi, -1, win32_bg)
 
-COLOR(reset, 00, -1, 01)
+COLOR(reset, 0, -1, -1)
 
 std::ostream &bold(std::ostream &stream) {
-    if (__builtin_expect(detail::is_atty(stream), 1))
-#if defined(MACOS) || defined(LINUX)
-        stream << "\033[1m";
+#if defined(MACOS) || defined(LINUX) || defined(__MINGW32__)
+    return stream << "\033[1m";
 #endif
-    return stream;
 }
 
-std::ostream &dark(std::ostream &stream);
-std::ostream &underline(std::ostream &stream);
-std::ostream &blink(std::ostream &stream);
+std::ostream &dark(std::ostream &stream) {
+#if defined(MACOS) || defined(LINUX) || defined(__MINGW32__)
+    return stream << "\033[2m";
+#endif
+}
+
+std::ostream &italics(std::ostream &stream) {
+#if defined(MACOS) || defined(LINUX) || defined(__MINGW32__)
+    return stream << "\033[3m";
+#endif
+}
+
+std::ostream &underline(std::ostream &stream) {
+#if defined(MACOS) || defined(LINUX) || defined(__MINGW32__)
+    return stream << "\033[4m";
+#endif
+}
+
+std::ostream &blink(std::ostream &stream) {
+#if defined(MACOS) || defined(LINUX) || defined(__MINGW32__)
+    return stream << "\033[5m";
+#endif
+}
 
 namespace fg {
 

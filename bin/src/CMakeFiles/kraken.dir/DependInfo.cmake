@@ -4,9 +4,9 @@ set(CMAKE_DEPENDS_LANGUAGES
   )
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_CXX
-  "/home/jacob/Documents/kraken/src/filesystem/io.cpp" "/home/jacob/Documents/kraken/bin/src/CMakeFiles/kraken.dir/filesystem/io.cpp.o"
-  "/home/jacob/Documents/kraken/src/memory/buffer.cpp" "/home/jacob/Documents/kraken/bin/src/CMakeFiles/kraken.dir/memory/buffer.cpp.o"
-  "/home/jacob/Documents/kraken/src/support/console.cpp" "/home/jacob/Documents/kraken/bin/src/CMakeFiles/kraken.dir/support/console.cpp.o"
+  "C:/Users/jake/Desktop/kraken/src/filesystem/io.cpp" "C:/Users/jake/Desktop/kraken/bin/src/CMakeFiles/kraken.dir/filesystem/io.cpp.obj"
+  "C:/Users/jake/Desktop/kraken/src/memory/buffer.cpp" "C:/Users/jake/Desktop/kraken/bin/src/CMakeFiles/kraken.dir/memory/buffer.cpp.obj"
+  "C:/Users/jake/Desktop/kraken/src/support/console.cpp" "C:/Users/jake/Desktop/kraken/bin/src/CMakeFiles/kraken.dir/support/console.cpp.obj"
   )
 set(CMAKE_CXX_COMPILER_ID "GNU")
 
