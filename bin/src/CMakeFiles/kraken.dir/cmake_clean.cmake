@@ -1,7 +1,10 @@
 file(REMOVE_RECURSE
-  "CMakeFiles/kraken.dir/filesystem/io.cpp.obj"
-  "CMakeFiles/kraken.dir/memory/buffer.cpp.obj"
-  "CMakeFiles/kraken.dir/support/console.cpp.obj"
+  "CMakeFiles/kraken.dir/filesystem/io.cpp.o"
+  "CMakeFiles/kraken.dir/memory/buffer.cpp.o"
+  "CMakeFiles/kraken.dir/lexer/lexer.cpp.o"
+  "CMakeFiles/kraken.dir/lexer/token.cpp.o"
+  "CMakeFiles/kraken.dir/support/console.cpp.o"
+  "CMakeFiles/kraken.dir/support/error.cpp.o"
   "libkraken.pdb"
   "libkraken.a"
 )

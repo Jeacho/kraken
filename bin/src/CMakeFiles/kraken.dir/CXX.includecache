@@ -48,6 +48,28 @@ io.h
 windows.h
 -
 
+../src/../inc/kraken/lexer/lexer.h
+memory
+-
+kraken/memory/buffer.h
+../src/../inc/kraken/lexer/kraken/memory/buffer.h
+kraken/adt/segment.h
+../src/../inc/kraken/lexer/kraken/adt/segment.h
+kraken/lexer/token.h
+../src/../inc/kraken/lexer/kraken/lexer/token.h
+kraken/support/error.h
+../src/../inc/kraken/lexer/kraken/support/error.h
+
+../src/../inc/kraken/lexer/token.h
+kraken/lexer/types.h
+../src/../inc/kraken/lexer/kraken/lexer/types.h
+kraken/adt/segment.h
+../src/../inc/kraken/lexer/kraken/adt/segment.h
+
+../src/../inc/kraken/lexer/types.h
+iostream
+-
+
 ../src/../inc/kraken/memory/buffer.h
 cassert
 -
@@ -68,19 +90,37 @@ cstdio
 kraken/support/compiler.h
 ../src/../inc/kraken/support/kraken/support/compiler.h
 
-C:/Users/jake/Desktop/kraken/src/filesystem/io.cpp
+../src/../inc/kraken/support/error.h
+array
+-
+cstring
+-
+kraken/adt/segment.h
+../src/../inc/kraken/support/kraken/adt/segment.h
+kraken/support/console.h
+../src/../inc/kraken/support/kraken/support/console.h
+
+/home/jacob/Documents/kraken/src/filesystem/io.cpp
 fstream
 -
 kraken/filesystem/io.h
-C:/Users/jake/Desktop/kraken/src/filesystem/kraken/filesystem/io.h
+/home/jacob/Documents/kraken/src/filesystem/kraken/filesystem/io.h
 
-C:/Users/jake/Desktop/kraken/src/memory/buffer.cpp
+/home/jacob/Documents/kraken/src/lexer/lexer.cpp
+kraken/lexer/lexer.h
+/home/jacob/Documents/kraken/src/lexer/kraken/lexer/lexer.h
+
+/home/jacob/Documents/kraken/src/lexer/token.cpp
+kraken/lexer/token.h
+/home/jacob/Documents/kraken/src/lexer/kraken/lexer/token.h
+
+/home/jacob/Documents/kraken/src/memory/buffer.cpp
 kraken/memory/buffer.h
-C:/Users/jake/Desktop/kraken/src/memory/kraken/memory/buffer.h
+/home/jacob/Documents/kraken/src/memory/kraken/memory/buffer.h
 
-C:/Users/jake/Desktop/kraken/src/support/console.cpp
+/home/jacob/Documents/kraken/src/support/console.cpp
 kraken/support/console.h
-C:/Users/jake/Desktop/kraken/src/support/kraken/support/console.h
+/home/jacob/Documents/kraken/src/support/kraken/support/console.h
 iostream
 -
 cstdio
@@ -91,4 +131,8 @@ io.h
 -
 windows.h
 -
+
+/home/jacob/Documents/kraken/src/support/error.cpp
+kraken/support/error.h
+/home/jacob/Documents/kraken/src/support/kraken/support/error.h
 

@@ -43,9 +43,7 @@ public:
     }
 
     // \brief Get character from the buffer
-    inline wchar_t get(std::size_t index) const {
-        if (index >= this->size())
-            throw std::out_of_range("buffer::get(std::size_t): index would cause dereference outside of buffer.");
+    inline wchar_t get(std::size_t index) const noexcept {
         return m_begin[index];
     }
 };

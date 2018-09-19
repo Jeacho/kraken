@@ -11,6 +11,7 @@ set(SOURCE_FILES test_entry.cpp
     filesystem/io_test.cpp
     memory/buffer_test.cpp
     support/console_test.cpp
+    support/error_test.cpp
 )
 
 include_directories(../${INC_DIR})

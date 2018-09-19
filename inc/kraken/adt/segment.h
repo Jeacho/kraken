@@ -40,7 +40,7 @@ public:
 
     // \brief Returns a pointer to this segments data.
     constexpr inline const_pointer data() const noexcept { return m_data; }
-    constexpr inline pointer data() noexcept { return const_cast<char *>(m_data); }
+    constexpr inline pointer data() noexcept { return const_cast<pointer>(m_data); }
 
     // \brief Returns the number of characters.
     constexpr inline size_type size()      const noexcept { return m_size; }
@@ -89,11 +89,17 @@ public:
         return starts_with(basic_segment<char_type>(prefix));
     }
 
-    inline operator const char *()  const noexcept { return this->data(); }
-    inline operator char *()        noexcept { return this->data(); }
+    inline operator const_pointer()  const noexcept { return this->data(); }
+    inline operator pointer()        noexcept { return this->data(); }
 };
 
 } // namespace detail
+
+template<typename char_type>
+std::basic_ostream<char_type> &operator<<(std::basic_ostream<char_type> &os,
+        const detail::basic_segment<char_type> &s) {
+    return os << std::basic_string<char_type>(s.data(), s.length());
+}
 
 typedef detail::basic_segment<char>     segment;
 typedef detail::basic_segment<wchar_t>  wsegment;

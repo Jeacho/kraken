@@ -1,9 +1,7 @@
 file(REMOVE_RECURSE
-  "CMakeFiles/kkc.dir/src/driver.cpp.obj"
+  "CMakeFiles/kkc.dir/src/driver.cpp.o"
   "kkc.pdb"
-  "kkc.exe"
-  "kkc.exe.manifest"
-  "libkkc.dll.a"
+  "kkc"
 )
 
 # Per-language clean rules from dependency scanning.

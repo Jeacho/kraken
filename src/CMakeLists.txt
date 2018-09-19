@@ -7,7 +7,10 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
 set(SRC
     filesystem/io.cpp
     memory/buffer.cpp
+    lexer/lexer.cpp
+    lexer/token.cpp
     support/console.cpp
+    support/error.cpp
 )
 
 include_directories(../${INC_DIR})

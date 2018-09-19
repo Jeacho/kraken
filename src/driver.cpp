@@ -4,13 +4,16 @@
 
 #include "kraken/support/console.h"
 #include "kraken/filesystem/io.h"
+#include "kraken/lexer/lexer.h"
 
 std::ostream &__KKC(std::ostream &stream) {
     return stream << bold << fg::blue << "[ KKC ] ";
 }
 
 int main(int argc, char *argv[]) {
-    std::vector<std::unique_ptr<mem::buffer>> paths;
+    std::setlocale(LC_ALL, "en_US.utf8");
+
+    std::vector<std::unique_ptr<mem::buffer>> buffers;
     std::vector<segment> args;
 
     for (std::size_t index = 1; index < argc; index++) {
@@ -28,15 +31,18 @@ int main(int argc, char *argv[]) {
                           << reset << "\": " << fg::red << "error: " << reset
                           << maybe_buffer.left()->message() << std::endl;
             } else {
-                paths.push_back(std::move(*maybe_buffer.right()));
+                buffers.push_back(std::move(*maybe_buffer.right()));
             }
         }
     }
 
-    if (paths.empty()) {
+    if (buffers.empty()) {
         std::cerr << __KKC << reset << "No input files..." << std::endl;
         return 0;
     }
+
+    lex::lexer lexer(std::move(buffers[0]));
+    std::wcout << lexer.scan() << std::endl;
 
     return 0;
 }

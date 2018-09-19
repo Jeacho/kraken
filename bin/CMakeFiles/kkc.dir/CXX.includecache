@@ -48,6 +48,28 @@ io.h
 windows.h
 -
 
+../inc/kraken/lexer/lexer.h
+memory
+-
+kraken/memory/buffer.h
+../inc/kraken/lexer/kraken/memory/buffer.h
+kraken/adt/segment.h
+../inc/kraken/lexer/kraken/adt/segment.h
+kraken/lexer/token.h
+../inc/kraken/lexer/kraken/lexer/token.h
+kraken/support/error.h
+../inc/kraken/lexer/kraken/support/error.h
+
+../inc/kraken/lexer/token.h
+kraken/lexer/types.h
+../inc/kraken/lexer/kraken/lexer/types.h
+kraken/adt/segment.h
+../inc/kraken/lexer/kraken/adt/segment.h
+
+../inc/kraken/lexer/types.h
+iostream
+-
+
 ../inc/kraken/memory/buffer.h
 cassert
 -
@@ -68,13 +90,25 @@ cstdio
 kraken/support/compiler.h
 ../inc/kraken/support/kraken/support/compiler.h
 
-C:/Users/jake/Desktop/kraken/src/driver.cpp
+../inc/kraken/support/error.h
+array
+-
+cstring
+-
+kraken/adt/segment.h
+../inc/kraken/support/kraken/adt/segment.h
+kraken/support/console.h
+../inc/kraken/support/kraken/support/console.h
+
+/home/jacob/Documents/kraken/src/driver.cpp
 iostream
 -
 vector
 -
 kraken/support/console.h
-C:/Users/jake/Desktop/kraken/src/kraken/support/console.h
+/home/jacob/Documents/kraken/src/kraken/support/console.h
 kraken/filesystem/io.h
-C:/Users/jake/Desktop/kraken/src/kraken/filesystem/io.h
+/home/jacob/Documents/kraken/src/kraken/filesystem/io.h
+kraken/lexer/lexer.h
+/home/jacob/Documents/kraken/src/kraken/lexer/lexer.h
 
